@@ -23,7 +23,7 @@ export const PagamentoProvider = ({ chieldren }) => {
         id: 4
     }];
 
-    const [formaPagamento, setFormaPagamento] = useState(tiposPagamento[0]);
+    const [formaPagamento, setFormaPagamento] = useState(tiposPagamento);
 
     return (
         <PagamentoContext.Provider value={{
@@ -31,7 +31,7 @@ export const PagamentoProvider = ({ chieldren }) => {
             formaPagamento,
             setFormaPagamento
         }}>
-            {chieldren}
+             {chieldren}
         </PagamentoContext.Provider>
     )
 }
