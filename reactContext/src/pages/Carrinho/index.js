@@ -3,15 +3,20 @@ import MuiAlert from '@material-ui/lab/Alert';
 import { useCarrinhoContext } from 'common/context/Carrinho';
 import { PagamentoContext } from 'common/context/Pagamento';
 import Produto from 'components/Produto';
-import { useContext, useState } from 'react';
+import { useContext, useMemo, useState } from 'react';
 import { useHistory } from 'react-router';
 import { Container, Voltar, TotalContainer, PagamentoContainer } from './styles';
+import { UsuarioContex } from 'common/context/Usuario';
 
 function Carrinho() {
+
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const { carrinho, valorTotalCarrinho } = useCarrinhoContext();
+  const { saldo = 0 } = useContext(UsuarioContex);
   const { tiposPagamento, formaPagamento, setFormaPagamento } = useContext(PagamentoContext);
   const history = useHistory();
+  const total = useMemo(()=> saldo - valorTotalCarrinho, [saldo , valorTotalCarrinho]);
+
   return (
     <Container>
       <Voltar onClick={() => history.goBack()} />
@@ -44,17 +49,18 @@ function Carrinho() {
         </div>
         <div>
           <h2> Saldo: </h2>
-          <span> R$ </span>
+          <span> R$ {Number(saldo).toFixed(2)} </span>
         </div>
         <div>
           <h2> Saldo Total: </h2>
-          <span> R$ </span>
+          <span> R$ {total.toFixed(2)} </span>
         </div>
       </TotalContainer>
       <Button
         onClick={() => {
           setOpenSnackbar(true);
         }}
+        disabled={total < 0}
         color="primary"
         variant="contained"
       >
