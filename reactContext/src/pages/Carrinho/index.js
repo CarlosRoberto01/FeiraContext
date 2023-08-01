@@ -3,23 +3,28 @@ import MuiAlert from '@material-ui/lab/Alert';
 import { useCarrinhoContext } from 'common/context/Carrinho';
 import { PagamentoContext } from 'common/context/Pagamento';
 import Produto from 'components/Produto';
-import { useContext, useState } from 'react';
+import { useContext, useMemo, useState } from 'react';
 import { useHistory } from 'react-router';
-import { Container, Voltar, TotalContainer, PagamentoContainer} from './styles';
+import { Container, Voltar, TotalContainer, PagamentoContainer } from './styles';
+import { UsuarioContex } from 'common/context/Usuario';
 
 function Carrinho() {
+
   const [openSnackbar, setOpenSnackbar] = useState(false);
-  const { carrinho } = useCarrinhoContext();
+  const { carrinho, valorTotalCarrinho, efetuarCompra } = useCarrinhoContext();
+  const { saldo = 0 } = useContext(UsuarioContex);
   const { tiposPagamento, formaPagamento, setFormaPagamento } = useContext(PagamentoContext);
   const history = useHistory();
+  const total = useMemo(()=> saldo - valorTotalCarrinho, [saldo , valorTotalCarrinho]);
+
   return (
     <Container>
-      <Voltar onClick={() => history.goBack()}/>
+      <Voltar onClick={() => history.goBack()} />
       <h2>
         Carrinho
       </h2>
       {carrinho.map(produto => (
-        <Produto 
+        <Produto
           {...produto}
           key={produto.id}
         />
@@ -38,45 +43,47 @@ function Carrinho() {
         </Select>
       </PagamentoContainer>
       <TotalContainer>
-          <div>
-            <h2>Total no Carrinho: </h2>
-            <span>R$ </span>
-          </div>
-          <div>
-            <h2> Saldo: </h2>
-            <span> R$ </span>
-          </div>
-          <div>
-            <h2> Saldo Total: </h2>
-            <span> R$ </span>
-          </div>
-        </TotalContainer>
+        <div>
+          <h2>Total no Carrinho: </h2>
+          <span>R$ {Number(valorTotalCarrinho).toFixed(2)} </span>
+        </div>
+        <div>
+          <h2> Saldo: </h2>
+          <span> R$ {Number(saldo).toFixed(2)} </span>
+        </div>
+        <div>
+          <h2> Saldo Total: </h2>
+          <span> R$ {Number(total).toFixed(2)} </span>
+        </div>
+      </TotalContainer>
       <Button
         onClick={() => {
+          efetuarCompra();
           setOpenSnackbar(true);
         }}
+        disabled={total < 0 || carrinho.length === 0}
         color="primary"
         variant="contained"
       >
-         Comprar
-       </Button>
-        <Snackbar
-          anchorOrigin={
-            { 
-              vertical: 'top',
-              horizontal: 'right'
-            }
+        Comprar
+      </Button>
+      <Snackbar
+        anchorOrigin={
+          {
+            vertical: 'top',
+            horizontal: 'right'
           }
-          open={openSnackbar}
+        }
+        open={openSnackbar}
+        onClose={() => setOpenSnackbar(false)}
+      >
+        <MuiAlert
           onClose={() => setOpenSnackbar(false)}
+          severity="success"
         >
-           <MuiAlert
-            onClose={() => setOpenSnackbar(false)}
-            severity="success"
-          >
-            Compra feita com sucesso!
-          </MuiAlert>
-        </Snackbar>
+          Compra feita com sucesso!
+        </MuiAlert>
+      </Snackbar>
     </Container>
   )
 }
