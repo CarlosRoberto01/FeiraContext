@@ -11,7 +11,7 @@ import { UsuarioContex } from 'common/context/Usuario';
 function Carrinho() {
 
   const [openSnackbar, setOpenSnackbar] = useState(false);
-  const { carrinho, valorTotalCarrinho } = useCarrinhoContext();
+  const { carrinho, valorTotalCarrinho, efetuarCompra } = useCarrinhoContext();
   const { saldo = 0 } = useContext(UsuarioContex);
   const { tiposPagamento, formaPagamento, setFormaPagamento } = useContext(PagamentoContext);
   const history = useHistory();
@@ -45,7 +45,7 @@ function Carrinho() {
       <TotalContainer>
         <div>
           <h2>Total no Carrinho: </h2>
-          <span>R$ {valorTotalCarrinho.toFixed(2)} </span>
+          <span>R$ {Number(valorTotalCarrinho).toFixed(2)} </span>
         </div>
         <div>
           <h2> Saldo: </h2>
@@ -53,14 +53,15 @@ function Carrinho() {
         </div>
         <div>
           <h2> Saldo Total: </h2>
-          <span> R$ {total.toFixed(2)} </span>
+          <span> R$ {Number(total).toFixed(2)} </span>
         </div>
       </TotalContainer>
       <Button
         onClick={() => {
+          efetuarCompra();
           setOpenSnackbar(true);
         }}
-        disabled={total < 0}
+        disabled={total < 0 || carrinho.length === 0}
         color="primary"
         variant="contained"
       >
